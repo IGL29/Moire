@@ -16,6 +16,14 @@ export default {
     Header,
     Footer,
   },
+
+  created() {
+    if (!localStorage.getItem('user')) {
+      this.$store.dispatch('createUser');
+    }
+    this.$store.commit('saveAccessKey');
+    this.$store.dispatch('loadBasketData');
+  },
 };
 </script>
 
