@@ -6,68 +6,68 @@
           Каталог
         </h1>
         <span class="content__info">
-          {{ countProducts }} товара
+          {{ numberProducts }} {{ declination(numberProducts, ['товар', 'товара', 'товаров']) }}
         </span>
+
+        <InputNumberItems :loading="loadingProducts" :error="errorRequest"/>
       </div>
     </div>
 
     <div class="content__catalog">
 
-      <FilterForm :filters="filters"/>
+      <FilterForm />
 
       <section class="catalog">
         <ProductsList
-          :products="prevProducts"
+          :products="products"
           :error="errorRequest"
           :loading="loadingProducts"
-          @repeat-request="getProducts"
         />
 
-        <ProductsPagination :countPages="countPages" :currentPage.sync="currentPage"/>
+        <ProductsPagination />
+
+        <router-link to="cart" title="Перейти в корзину">
+          <NotifyMessage
+            :showMessage="successfulRequestNotify"
+            text="Товар добавлен в корзину"
+          />
+        </router-link>
+
+        <NotifyMessage
+          :showMessage="errorRequestNotify"
+          text="Произошла ошибка при добавлении товара"
+        />
       </section>
     </div>
   </main>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+import declination from '@/mixins/declination.vue';
+import NotifyMessage from '@/components/NotifyMessage.vue';
+import InputNumberItems from '@/components/InputNumberItems.vue';
 import FilterForm from '@/components/FilterForm.vue';
 import ProductsPagination from '@/components/ProductsPagination.vue';
 import ProductsList from '@/components/ProductsList.vue';
 
 export default {
+  mixins: [declination],
+
   data() {
     return {
-      numberPrevProducts: 12,
-      currentPage: 1,
       errorRequest: false,
       loadingProducts: false,
-      filters: {
-        inputPriceFrom: 0,
-        inputPriceTo: 12345,
-        inputSelectCategory: '',
-        inputColors: [],
-        inputMaterials: [],
-        inputSeasons: [],
-      },
     };
   },
 
   computed: {
-    products() {
-      this.resetToFirstPage();
-      return this.$store.getters.products;
-    },
-    countProducts() {
-      return this.products.length;
-    },
-    countPages() {
-      const pages = Math.ceil(this.countProducts / this.numberPrevProducts);
-      return pages || 1;
-    },
-    prevProducts() {
-      const offset = (this.currentPage - 1) * this.numberPrevProducts;
-      return this.products.slice(offset, offset + this.numberPrevProducts);
-    },
+    ...mapGetters([
+      'products',
+      'numberProducts',
+      'successfulRequestNotify',
+      'errorRequestNotify',
+    ]),
   },
 
   methods: {
@@ -82,15 +82,14 @@ export default {
           this.errorRequest = true;
         });
     },
-    resetToFirstPage() {
-      this.currentPage = 1;
-    },
   },
 
   components: {
+    InputNumberItems,
     FilterForm,
     ProductsPagination,
     ProductsList,
+    NotifyMessage,
   },
 
   created() {

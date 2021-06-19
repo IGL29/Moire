@@ -8,6 +8,7 @@
             class="form__input"
             type="text"
             name="min-price"
+            placeholder="0"
             v-model.number="filters.inputPriceFrom"
           />
           <span class="form__value">От</span>
@@ -17,6 +18,7 @@
             class="form__input"
             type="text"
             name="max-price"
+            placeholder="12345"
             v-model.number="filters.inputPriceTo"
           />
           <span class="form__value">До</span>
@@ -32,9 +34,9 @@
             name="category"
             v-model="filters.inputSelectCategory"
           >
-            <option value="">Все категории</option>
+            <option :value="null">Все категории</option>
             <option
-              :value="category.slug"
+              :value="category.id"
               v-for="category of categories"
               :key="category.id"
             >{{ category.title }}</option>
@@ -110,6 +112,7 @@
         class="filter__reset button button--second"
         type="button"
         @click.prevent="resetFilter"
+        v-if="filterFieldsNotEmpty"
       >
         Сбросить
       </button>
@@ -118,60 +121,40 @@
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      filters: {
-        inputPriceFrom: 0,
-        inputPriceTo: 12345,
-        inputSelectCategory: '',
-        inputColors: [],
-        inputMaterials: [],
-        inputSeasons: [],
-      },
-    };
-  },
+import { mapGetters, mapActions } from 'vuex';
 
+export default {
   computed: {
-    materials() {
-      return this.$store.state.materialsData;
-    },
-    seasons() {
-      return this.$store.state.seasonsData;
-    },
-    categories() {
-      return this.$store.state.categoriesData;
-    },
-    colors() {
-      return this.$store.state.colorsData;
+    ...mapGetters([
+      'filters',
+      'materials',
+      'seasons',
+      'categories',
+      'colors',
+    ]),
+
+    filterFieldsNotEmpty() {
+      return Object.values(this.filters).some((filter) => {
+        if (Array.isArray(filter)) {
+          return filter.length;
+        }
+        return filter;
+      });
     },
   },
 
   methods: {
-    getMaterials() {
-      this.$store.dispatch('loadMaterialsData');
-    },
-    getSeasons() {
-      this.$store.dispatch('loadSeasonsData');
-    },
-    getCategories() {
-      this.$store.dispatch('loadCategoriesData');
-    },
-    getColors() {
-      this.$store.dispatch('loadColorsData');
-    },
-    filterProducts() {
-      this.$store.commit('filterProducts', this.filters);
-    },
-    resetFilter() {
-      this.filters.inputPriceFrom = 0;
-      this.filters.inputPriceTo = 12345;
-      this.filters.inputSelectCategory = '';
-      this.filters.inputColors = [];
-      this.filters.inputMaterials = [];
-      this.filters.inputSeasons = [];
+    ...mapActions({
+      getMaterials: 'loadMaterialsData',
+      getSeasons: 'loadSeasonsData',
+      getCategories: 'loadCategoriesData',
+      getColors: 'loadColorsData',
+      filterProducts: 'loadProductsData',
+    }),
 
+    resetFilter() {
       this.$store.commit('resetFilter');
+      this.filterProducts();
     },
   },
 

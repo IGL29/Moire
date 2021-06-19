@@ -12,13 +12,13 @@
         </svg>
       </a>
     </li>
-    <li class="pagination__item" v-for="pageNumber of countPages" :key="pageNumber">
+    <li class="pagination__item" v-for="page of numberPages" :key="page">
       <a
         class="pagination__link"
-        :class="{ 'pagination__link--current': addClassActivePage(pageNumber) }"
-        @click.prevent="goToPage(pageNumber)"
+        :class="{ 'pagination__link--current': addClassActivePage(page) }"
+        @click.prevent="goToPage(page)"
       >
-        {{ pageNumber }}
+        {{ page }}
       </a>
     </li>
 
@@ -44,13 +44,19 @@
 </template>
 
 <script>
-export default {
-  props: ['countPages', 'currentPage'],
+import { mapGetters } from 'vuex';
 
+export default {
   computed: {
+    ...mapGetters([
+      'numberPages',
+      'currentPage',
+    ]),
+
     allowedGoToNextPage() {
-      return this.countPages > this.currentPage;
+      return this.numberPages > this.currentPage;
     },
+
     allowedGoToPrevPage() {
       return this.currentPage > 1;
     },
@@ -60,17 +66,23 @@ export default {
     addClassActivePage(page) {
       return page === this.currentPage;
     },
+
     goToPage(page) {
-      this.$emit('update:currentPage', page);
+      this.$store.commit('updateCurrentPage', page);
+      this.$store.dispatch('loadProductsData');
     },
+
     goToNextPage() {
       if (this.allowedGoToNextPage) {
-        this.$emit('update:currentPage', this.currentPage + 1);
+        this.$store.commit('updateCurrentPage', this.currentPage + 1);
+        this.$store.dispatch('loadProductsData');
       }
     },
+
     goToPrevPage() {
       if (this.allowedGoToPrevPage) {
-        this.$emit('update:currentPage', this.currentPage - 1);
+        this.$store.commit('updateCurrentPage', this.currentPage - 1);
+        this.$store.dispatch('loadProductsData');
       }
     },
   },

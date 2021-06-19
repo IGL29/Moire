@@ -123,6 +123,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import FormField from '@/components/FormField.vue';
 import CartProductsInfo from '@/components/CartProductsInfo.vue';
@@ -140,6 +141,13 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      payments: 'payments',
+      products: 'productsInCart',
+      numberProducts: 'numberProductsInCart',
+      totalPriceCart: 'totalPriceCart',
+    }),
+
     deliveries() {
       return this.$store.getters.deliveries;
     },
@@ -154,21 +162,8 @@ export default {
       return price;
     },
 
-    payments() {
-      return this.$store.getters.payments;
-    },
-
-    products() {
-      return this.$store.getters.productsInCart;
-    },
-
-    numberProducts() {
-      return this.$store.getters.numberProductsInCart;
-    },
-
     totalPrice() {
-      const priceProductsInCart = this.$store.getters.totalPriceCart;
-      return Number(priceProductsInCart) + Number(this.priceSelectedDelivery);
+      return Number(this.totalPriceCart) + Number(this.priceSelectedDelivery);
     },
   },
 
@@ -208,10 +203,7 @@ export default {
         paymentTypeId: this.paymentTypeId,
       })
         .then((response) => {
-          // eslint-disable-next-line no-console
-          console.log(response);
           this.$store.commit('resetCart');
-          // this.$store.commit('saveOrderData', response.data);
           this.$router.push({ name: 'order-info', params: { id: response.data.id } });
         })
         .catch((error) => {

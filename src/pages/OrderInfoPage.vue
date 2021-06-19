@@ -59,30 +59,19 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import CartProductsInfo from '@/components/CartProductsInfo.vue';
 
 export default {
   computed: {
-    orderInfo() {
-      return this.$store.getters.orderData;
-    },
-
-    products() {
-      return this.$store.getters.orderProducts;
-    },
-
-    numberProducts() {
-      return this.$store.getters.orderNumberProducts;
-    },
-
-    totalPrice() {
-      return this.$store.getters.orderTotalPrice;
-    },
-
-    deliveryPrice() {
-      return this.$store.getters.orderDeliveryPrice;
-    },
+    ...mapGetters({
+      orderInfo: 'orderData',
+      products: 'orderProducts',
+      numberProducts: 'orderNumberProducts',
+      totalPrice: 'orderTotalPrice',
+      deliveryPrice: 'orderDeliveryPrice',
+    }),
   },
 
   methods: {

@@ -7,11 +7,10 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    accessKey: '',
+    accessKey: null,
     basketData: [],
     productsData: [],
     productData: null,
-    filteredProducts: [],
     materialsData: [],
     seasonsData: [],
     categoriesData: [],
@@ -19,15 +18,71 @@ export default new Vuex.Store({
     deliveries: [],
     payments: [],
     orderData: null,
+    currentPage: 1,
+    numberPrevProducts: 12,
+    numberPages: null,
+    numberProducts: null,
+    successfulRequestNotify: false,
+    errorRequestNotify: false,
+    timerNotify: null,
+
+    filters: {
+      inputPriceFrom: null,
+      inputPriceTo: null,
+      inputSelectCategory: null,
+      inputColors: [],
+      inputMaterials: [],
+      inputSeasons: [],
+    },
   },
 
   getters: {
     products(state) {
-      return state.filteredProducts;
+      return state.productsData;
+    },
+
+    numberPrevProducts(state) {
+      return state.numberPrevProducts;
+    },
+
+    numberProducts(state) {
+      return state.numberProducts;
+    },
+
+    numberPages(state) {
+      return state.numberPages;
+    },
+
+    currentPage(state) {
+      return state.currentPage;
+    },
+
+    basketData(state) {
+      return state.basketData;
     },
 
     numberProductsInCart(state) {
       return state.basketData.length;
+    },
+
+    filters(state) {
+      return state.filters;
+    },
+
+    materials(state) {
+      return state.materialsData;
+    },
+
+    seasons(state) {
+      return state.seasonsData;
+    },
+
+    categories(state) {
+      return state.categoriesData;
+    },
+
+    colors(state) {
+      return state.colorsData;
     },
 
     totalPriceCart(state) {
@@ -68,12 +123,35 @@ export default new Vuex.Store({
     orderDeliveryPrice(state) {
       return state.orderData.deliveryType.price;
     },
+
+    successfulRequestNotify(state) {
+      return state.successfulRequestNotify;
+    },
+
+    errorRequestNotify(state) {
+      return state.errorRequestNotify;
+    },
   },
 
   mutations: {
     addPoductsData(state, response) {
       state.productsData = response;
-      state.filteredProducts = state.productsData;
+    },
+
+    updateNumberPages(state, response) {
+      state.numberPages = response;
+    },
+
+    updateNumberPrevProducts(state, numbers) {
+      state.numberPrevProducts = numbers;
+    },
+
+    updateNumberProducts(state, response) {
+      state.numberProducts = response;
+    },
+
+    updateCurrentPage(state, page) {
+      state.currentPage = page;
     },
 
     addMaterialsData(state, response) {
@@ -93,53 +171,16 @@ export default new Vuex.Store({
     },
 
     filterProducts(state, filters) {
-      let filteredProducts = state.productsData;
-      if (filters.inputPriceFrom) {
-        filteredProducts = filteredProducts.filter((product) => (
-          product.price >= filters.inputPriceFrom
-        ));
-      }
-      if (filters.inputPriceTo) {
-        filteredProducts = filteredProducts.filter((product) => (
-          product.price <= filters.inputPriceTo
-        ));
-      }
-      if (filters.inputSelectCategory) {
-        filteredProducts = filteredProducts.filter((product) => (
-          product.slug === filters.inputSelectCategory
-        ));
-      }
-      if (filters.inputColors.length) {
-        filteredProducts = filteredProducts.filter((product) => (
-          product.colors.find((productColor) => (
-            filters.inputColors.find((color) => (
-              (color === productColor.color.id)
-            ))
-          ))
-        ));
-      }
-      if (filters.inputMaterials.length) {
-        filteredProducts = filteredProducts.filter((product) => (
-          product.materials.find((materialItem) => (
-            filters.inputMaterial.find((selectedMaterial) => (
-              (selectedMaterial === materialItem.id)
-            ))
-          ))
-        ));
-      }
-      if (filters.inputSeasons.length) {
-        filteredProducts = filteredProducts.filter((product) => (
-          product.seasons.find((seasonItem) => (
-            filters.inputSeasons.find((selectedSeason) => (
-              (selectedSeason === seasonItem.id)
-            ))
-          ))
-        ));
-      }
-      state.filteredProducts = filteredProducts;
+      state.filters = filters;
     },
+
     resetFilter(state) {
-      state.filteredProducts = state.productsData;
+      state.filters.inputPriceFrom = null;
+      state.filters.inputPriceTo = null;
+      state.filters.inputSelectCategory = null;
+      state.filters.inputColors = [];
+      state.filters.inputMaterials = [];
+      state.filters.inputSeasons = [];
     },
 
     addProduct(state, response) {
@@ -172,13 +213,37 @@ export default new Vuex.Store({
     resetCart(state) {
       state.basketData = [];
     },
+
+    showNotifySuccess(state) {
+      clearTimeout(state.timerNotify);
+      state.successfulRequestNotify = true;
+      state.timerNotify = setTimeout(() => { state.successfulRequestNotify = false; }, 2000);
+    },
+    showNotifyError(state) {
+      clearTimeout(state.errorRequestNotify);
+      state.errorRequestNotify = true;
+      state.timerNotify = setTimeout(() => { state.errorRequestNotify = false; }, 2000);
+    },
   },
 
   actions: {
     loadProductsData(context) {
       return axios
-        .get(`${API_BASE_URL}/api/products`)
+        .get(`${API_BASE_URL}/api/products`, {
+          params: {
+            page: context.state.currentPage,
+            limit: context.state.numberPrevProducts,
+            categoryId: context.state.filters.inputSelectCategory,
+            materialIds: context.state.filters.inputMaterials,
+            seasonIds: context.state.filters.inputSeasons,
+            colorIds: context.state.filters.inputColors,
+            minPrice: context.state.filters.inputPriceFrom,
+            maxPrice: context.state.filters.inputPriceTo,
+          },
+        })
         .then((response) => {
+          context.commit('updateNumberPages', response.data.pagination.pages);
+          context.commit('updateNumberProducts', response.data.pagination.total);
           context.commit('addPoductsData', response.data.items);
         });
     },
@@ -218,9 +283,10 @@ export default new Vuex.Store({
     loadProductData(context, { slug }) {
       return axios
         .get(`${API_BASE_URL}/api/products/${slug}`)
-        .then((response) => (
-          context.commit('addProduct', response.data)
-        ));
+        .then((response) => {
+          context.commit('addProduct', response.data);
+          return response.data;
+        });
     },
 
     loadBasketData(context) {

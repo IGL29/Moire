@@ -1,7 +1,7 @@
 <template>
   <Loader v-if="loading" />
 
-  <Error v-else-if="error" @repeat-request="this.$emit('repeat-request');"/>
+  <Error v-else-if="error"/>
 
   <ProductsNotFound v-else-if="!products.length" :message="messageNotFoundProducts" />
 

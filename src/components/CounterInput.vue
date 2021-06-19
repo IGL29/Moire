@@ -13,6 +13,8 @@
     <input
       type="number"
       name="count"
+      @input="enteringNumber"
+      @focusout="enteringNumFocusOut"
       v-model.number="quantity"
     />
 
@@ -51,12 +53,12 @@ export default {
 
     enteringNumber() {
       if (this.inputValue >= 1) {
-        this.$emit('update:number', this.inputValue);
+        this.$emit('update:number', this.quantity);
       }
     },
     enteringNumFocusOut() {
-      if (this.inputValue < 1) {
-        this.inputValue = this.number;
+      if (this.quantity < 1) {
+        this.quantity = this.number;
       }
     },
   },

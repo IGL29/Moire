@@ -116,11 +116,25 @@
           <component :is="currentTabComponent"></component>
         </div>
       </div>
+
+      <router-link to="cart" title="Перейти в корзину">
+        <NotifyMessage
+          :showMessage="successfulRequestNotify"
+          text="Товар добавлен в корзину"
+        />
+      </router-link>
+
+      <NotifyMessage
+        :showMessage="errorRequestNotify"
+        text="Произошла ошибка при добавлении товара"
+      />
     </section>
   </main>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+import NotifyMessage from '@/components/NotifyMessage.vue';
 import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import ProductDescription from '@/components/ProductDescription.vue';
 import ProductDeliveryInfo from '@/components/ProductDeliveryInfo.vue';
@@ -153,6 +167,11 @@ export default {
   },
 
   computed: {
+    ...mapGetters([
+      'successfulRequestNotify',
+      'errorRequestNotify',
+    ]),
+
     product() {
       return this.$store.state.productData;
     },
@@ -199,7 +218,13 @@ export default {
         colorId: this.selectedColorId,
         sizeId: this.selectedSizeId,
         quantity: this.quantityProducts,
-      });
+      })
+        .then(() => {
+          this.$store.commit('showNotifySuccess');
+        })
+        .catch(() => {
+          this.$store.commit('showNotifyError');
+        });
     },
 
     setDefaultColor() {
@@ -223,6 +248,7 @@ export default {
     CounterInput,
     Loader,
     Error,
+    NotifyMessage,
   },
 
   watch: {

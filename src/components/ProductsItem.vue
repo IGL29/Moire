@@ -1,31 +1,55 @@
 <template>
   <li class="catalog__item">
-    <router-link :to="{ name: 'product', params: { slug: product.slug } }" class="catalog__pic">
-      <img :src="checkDataProductImage(product)" :alt="product.title" />
+    <button
+      class="catalog__btn-add"
+      :class="{ 'added-to-cart': productStatus }"
+      title="Добавить в корзину"
+      @click.prevent="addProductToCart"
+    >
+      <svg width="24" height="24" v-if="loading">
+        <use xlink:href="#icon-loading"></use>
+      </svg>
+
+      <svg width="24" height="24" v-else>
+        <use xlink:href="#icon-cart-card"></use>
+      </svg>
+    </button>
+
+    <router-link
+      title="Перейти на страницу товара"
+      :to="{ name: 'product', params: { slug: product.slug } }"
+      class="catalog__pic"
+    >
+      <img :src="currentImage" :alt="product.title" />
     </router-link>
 
-    <h3 class="catalog__title">
-      <router-link :to="{ name: 'product', params: { slug: product.slug } }">
-        {{ product.title }}
-      </router-link>
-    </h3>
+    <div class="catalog__wrapper">
+      <h3 class="catalog__title">
+        <router-link
+          title="Перейти на страницу товара"
+          :to="{ name: 'product', params: { slug: product.slug } }"
+        >
+          {{ product.title }}
+        </router-link>
+      </h3>
 
-    <span class="catalog__price"> {{ product.price }} ₽ </span>
+      <span class="catalog__price"> {{ product.price }} ₽ </span>
 
-    <ul class="colors colors--black">
-      <li class="colors__item" v-for="color of product.colors" :key="color.color.id">
-        <label class="colors__label">
-          <input
-            class="colors__radio sr-only"
-            type="radio"
-            :name="`colors-item-${product.slug}`"
-            :value="color.color.id"
-            v-model="selectedColor"
-          />
-          <span class="colors__value" :style="{ backgroundColor: color.color.code }"> </span>
-        </label>
-      </li>
-    </ul>
+      <ul class="colors colors--black">
+        <li class="colors__item" v-for="color of product.colors" :key="color.color.id">
+          <label class="colors__label">
+            <input
+              class="colors__radio sr-only"
+              type="radio"
+              :name="`colors-item-${product.slug}`"
+              :value="color.color.id"
+              v-model="selectedColorId"
+            />
+            <span class="colors__value" :style="{ backgroundColor: color.color.code }"> </span>
+          </label>
+        </li>
+      </ul>
+    </div>
   </li>
 </template>
 
@@ -35,27 +59,70 @@ export default {
 
   data() {
     return {
-      selectedColor: '',
+      selectedColorId: '',
+      loading: false,
     };
   },
 
-  methods: {
-    checkDataProductImage(product) {
-      if (product?.colors[0]?.gallery) {
-        return product.colors[0].gallery[0].file.url;
-      }
-      return '../img/no_image.png';
+  computed: {
+    firstColorOption() {
+      return this.product.colors[0].color.id;
     },
 
-    setDefaultColor() {
-      if (!this.selectedColor && this.product.colors[0].color.id) {
-        this.selectedColor = this.product.colors[0].color.id;
+    currentImage() {
+      let pictureByColor = null;
+      const colorItem = this.product.colors.find((color) => (
+        Number(color.color.id) === Number(this.selectedColorId)
+      ));
+      if (colorItem.gallery?.[0]?.file?.url) {
+        pictureByColor = colorItem.gallery[0].file.url;
+      } else {
+        pictureByColor = '../img/no_image.png';
       }
+      return pictureByColor;
+    },
+
+    productsInCart() {
+      return this.$store.getters.productsInCart;
+    },
+
+    productStatus() {
+      return this.productsInCart.some((productInCart) => (
+        (productInCart.product.id === this.product.id
+        && Number(productInCart.color.color.id) === Number(this.selectedColorId))
+      ));
+    },
+  },
+
+  methods: {
+    currentColor() {
+      if (!this.selectedColorId && this.firstColorOption) {
+        this.selectedColorId = this.firstColorOption;
+      }
+    },
+
+    async addProductToCart() {
+      this.loading = true;
+      const product = await this.$store.dispatch('loadProductData', { slug: this.product.slug });
+      const selectedSizeId = product.sizes[0].id;
+      this.$store.dispatch('addProductToCart', {
+        productId: this.product.id,
+        colorId: this.selectedColorId,
+        sizeId: selectedSizeId,
+        quantity: 1,
+      })
+        .then(() => {
+          this.loading = false;
+          this.$store.commit('showNotifySuccess');
+        })
+        .catch(() => {
+          this.$store.commit('showNotifyError');
+        });
     },
   },
 
   created() {
-    this.setDefaultColor();
+    this.currentColor();
   },
 };
 </script>

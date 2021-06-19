@@ -2,7 +2,7 @@
   <li class="cart__item product">
     <div class="product__pic">
       <img
-        :src="product.color.gallery[0].file.url"
+        :src="checkImage(product)"
         width="120"
         height="120"
         srcset="img/product-square-4@2x.jpg 2x"
@@ -31,7 +31,11 @@
       aria-label="Удалить товар из корзины"
       @click.prevent="deleteProduct"
     >
-      <svg width="20" height="20" fill="currentColor">
+      <svg width="20" height="20" v-if="loading">
+        <use xlink:href="#icon-loading"></use>
+      </svg>
+
+      <svg width="20" height="20" fill="currentColor" v-else>
         <use xlink:href="#icon-close"></use>
       </svg>
     </button>
@@ -47,6 +51,7 @@ export default {
   data() {
     return {
       quantityProducts: this.product.quantity,
+      loading: false,
     };
   },
 
@@ -59,9 +64,24 @@ export default {
     },
 
     deleteProduct() {
+      this.loading = true;
       this.$store.dispatch('deleteProduct', {
         basketItemId: this.product.id,
-      });
+      })
+        .then(() => {
+          this.$store.commit('showNotifySuccess');
+        })
+        .catch(() => {
+          this.$store.commit('showNotifyError');
+        })
+        .finally(() => { this.loading = false; });
+    },
+
+    checkImage(product) {
+      if (product.color?.gallery?.[0]?.file.url) {
+        return product.color?.gallery?.[0]?.file.url;
+      }
+      return '../img/no_image.png';
     },
   },
 

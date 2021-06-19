@@ -15,8 +15,9 @@
         <h1 class="content__title">
           Корзина
         </h1>
+
         <span class="content__info">
-          {{ numberProducts }} товара
+          {{ numberProducts }} {{ declination(numberProducts, ['товар', 'товара', 'товаров']) }}
         </span>
       </div>
     </div>
@@ -29,10 +30,18 @@
         method="POST"
       >
         <div class="cart__field">
-          <ProductsNotFound v-if="!productsCart.length" :message="messageCartEmpty" />
+          <ProductsNotFound
+            v-if="!productsCart.length"
+            :message="messageCartEmpty"
+            class="cart__not-found"
+          />
 
           <ul class="cart__list">
-            <CartItem v-for="product of productsCart" :key="product.id" :product="product"/>
+            <CartItem
+              v-for="product of productsCart"
+              :key="product.id"
+              :product="product"
+            />
           </ul>
         </div>
 
@@ -51,18 +60,33 @@
           </router-link>
         </div>
       </form>
+
+      <NotifyMessage
+        :showMessage="successfulRequestNotify"
+        text="Товар удален из корзины"
+      />
+
+      <NotifyMessage
+        :showMessage="errorRequestNotify"
+        text="Произошла ошибка при удалении товара"
+      />
     </section>
   </main>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+import declination from '@/mixins/declination.vue';
 import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import ProductsNotFound from '@/components/ProductsNotFound.vue';
 import Error from '@/components/Error.vue';
 import Loader from '@/components/Loader.vue';
 import CartItem from '@/components/CartItem.vue';
+import NotifyMessage from '@/components/NotifyMessage.vue';
 
 export default {
+  mixins: [declination],
+
   data() {
     return {
       loadingCart: false,
@@ -72,17 +96,13 @@ export default {
   },
 
   computed: {
-    productsCart() {
-      return this.$store.state.basketData;
-    },
-
-    totalPrice() {
-      return this.$store.getters.totalPriceCart;
-    },
-
-    numberProducts() {
-      return this.$store.getters.numberProductsInCart;
-    },
+    ...mapGetters({
+      productsCart: 'basketData',
+      totalPrice: 'totalPriceCart',
+      numberProducts: 'numberProductsInCart',
+      successfulRequestNotify: 'successfulRequestNotify',
+      errorRequestNotify: 'errorRequestNotify',
+    }),
   },
 
   methods: {
@@ -106,6 +126,7 @@ export default {
     CartItem,
     BreadCrumbs,
     ProductsNotFound,
+    NotifyMessage,
   },
 
   created() {

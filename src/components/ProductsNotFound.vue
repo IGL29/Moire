@@ -10,10 +10,3 @@ export default {
   props: ['message'],
 };
 </script>
-
-<style>
-  .cart__field > .not-found {
-    margin-top: 100px;
-    text-align: center;
-  };
-</style>

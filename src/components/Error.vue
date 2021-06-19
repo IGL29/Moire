@@ -13,7 +13,7 @@ export default {
 
   methods: {
     repeatRequest() {
-      this.$emit('repeat-request');
+      this.$store.dispatch('loadProductsData');
     },
   },
 };
