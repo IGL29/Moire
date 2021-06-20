@@ -224,6 +224,14 @@ export default new Vuex.Store({
       state.errorRequestNotify = true;
       state.timerNotify = setTimeout(() => { state.errorRequestNotify = false; }, 2000);
     },
+
+    clearTimerNotify(state) {
+      if (state.successfulRequestNotify || state.errorRequestNotify) {
+        clearTimeout(state.timerNotify);
+        state.successfulRequestNotify = false;
+        state.errorRequestNotify = false;
+      }
+    },
   },
 
   actions: {

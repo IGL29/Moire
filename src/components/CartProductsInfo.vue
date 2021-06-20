@@ -20,6 +20,8 @@ import OrderList from '@/components/OrderList.vue';
 import declination from '@/mixins/declination.vue';
 
 export default {
+  name: 'CartProductsInfo',
+
   mixins: [declination],
 
   props: ['products', 'numberProducts', 'totalPrice', 'deliveryPrice'],

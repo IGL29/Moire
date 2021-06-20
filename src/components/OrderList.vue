@@ -8,6 +8,8 @@
 import OrderItem from '@/components/OrderItem.vue';
 
 export default {
+  name: 'OrderList',
+
   props: ['products'],
 
   components: {

@@ -20,7 +20,7 @@
       :to="{ name: 'product', params: { slug: product.slug } }"
       class="catalog__pic"
     >
-      <img :src="currentImage" :alt="product.title" />
+      <img :src="currentImage()" :alt="product.title" />
     </router-link>
 
     <div class="catalog__wrapper">
@@ -54,8 +54,14 @@
 </template>
 
 <script>
+import changeImage from '@/mixins/changeImage.vue';
+
 export default {
+  name: 'ProductsItem',
+
   props: ['product'],
+
+  mixins: [changeImage],
 
   data() {
     return {
@@ -69,21 +75,8 @@ export default {
       return this.product.colors[0].color.id;
     },
 
-    currentImage() {
-      let pictureByColor = null;
-      const colorItem = this.product.colors.find((color) => (
-        Number(color.color.id) === Number(this.selectedColorId)
-      ));
-      if (colorItem.gallery?.[0]?.file?.url) {
-        pictureByColor = colorItem.gallery[0].file.url;
-      } else {
-        pictureByColor = '../img/no_image.png';
-      }
-      return pictureByColor;
-    },
-
     productsInCart() {
-      return this.$store.getters.productsInCart;
+      return this.$store.getters.basketData;
     },
 
     productStatus() {

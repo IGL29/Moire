@@ -22,11 +22,6 @@
       </a>
     </li>
 
-    <!-- <li class="pagination__item">
-      <a class="pagination__link" href="#">
-        ...
-      </a>
-    </li> -->
     <li class="pagination__item">
       <a
         class="pagination__link pagination__link--arrow"
@@ -47,6 +42,8 @@
 import { mapGetters } from 'vuex';
 
 export default {
+  name: 'ProductsPagination',
+
   computed: {
     ...mapGetters([
       'numberPages',

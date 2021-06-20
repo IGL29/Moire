@@ -1,7 +1,7 @@
 <template>
-  <Loader v-if="loadingCart"/>
+  <LoaderElement v-if="loadingCart"/>
 
-  <Error v-else-if="errorRequest"/>
+  <ErrorNotify v-else-if="errorRequest"  class="wrapper__cart" />
 
   <main class="content container" v-else>
     <div class="content__top">
@@ -79,12 +79,14 @@ import { mapGetters } from 'vuex';
 import declination from '@/mixins/declination.vue';
 import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import ProductsNotFound from '@/components/ProductsNotFound.vue';
-import Error from '@/components/Error.vue';
-import Loader from '@/components/Loader.vue';
+import ErrorNotify from '@/components/ErrorNotify.vue';
+import LoaderElement from '@/components/LoaderElement.vue';
 import CartItem from '@/components/CartItem.vue';
 import NotifyMessage from '@/components/NotifyMessage.vue';
 
 export default {
+  name: 'CartPage',
+
   mixins: [declination],
 
   data() {
@@ -121,8 +123,8 @@ export default {
   },
 
   components: {
-    Loader,
-    Error,
+    LoaderElement,
+    ErrorNotify,
     CartItem,
     BreadCrumbs,
     ProductsNotFound,
@@ -130,6 +132,7 @@ export default {
   },
 
   created() {
+    this.$store.commit('clearTimerNotify');
     this.getProducts();
   },
 };

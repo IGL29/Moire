@@ -64,6 +64,8 @@ import BreadCrumbs from '@/components/BreadCrumbs.vue';
 import CartProductsInfo from '@/components/CartProductsInfo.vue';
 
 export default {
+  name: 'OrderInfoPage',
+
   computed: {
     ...mapGetters({
       orderInfo: 'orderData',

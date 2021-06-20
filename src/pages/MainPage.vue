@@ -26,7 +26,7 @@
 
         <ProductsPagination />
 
-        <router-link to="cart" title="Перейти в корзину">
+        <router-link :to="{ name: 'cart' }" title="Перейти в корзину">
           <NotifyMessage
             :showMessage="successfulRequestNotify"
             text="Товар добавлен в корзину"
@@ -52,6 +52,8 @@ import ProductsPagination from '@/components/ProductsPagination.vue';
 import ProductsList from '@/components/ProductsList.vue';
 
 export default {
+  name: 'MainPage',
+
   mixins: [declination],
 
   data() {
@@ -93,6 +95,7 @@ export default {
   },
 
   created() {
+    this.$store.commit('clearTimerNotify');
     this.getProducts();
   },
 };

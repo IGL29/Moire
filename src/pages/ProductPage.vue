@@ -1,7 +1,7 @@
 <template>
-  <Loader v-if="loadingProduct" />
+  <LoaderElement v-if="loadingProduct" />
 
-  <Error v-else-if="errorResponse" />
+  <ErrorNotify v-else-if="errorResponse" />
 
   <main class="content container" v-else-if="product">
     <div class="content__top">
@@ -16,35 +16,11 @@
           <img
             width="570"
             height="570"
-            :src="product.colors[0].gallery[0].file.url"
+            :src="currentImage()"
             srcset="img/product-square-1@2x.jpg 2x"
             alt="Название товара"
           />
         </div>
-        <ul class="pics__list">
-          <li class="pics__item">
-            <a href="" class="pics__link pics__link--current">
-              <img
-                width="98"
-                height="98"
-                src="img/product-square-2.jpg"
-                srcset="img/product-square-2@2x.jpg 2x"
-                alt="Название товара"
-              />
-            </a>
-          </li>
-          <li class="pics__item">
-            <a href="" class="pics__link">
-              <img
-                width="98"
-                height="98"
-                src="img/product-square-3.jpg"
-                srcset="img/product-square-3@2x.jpg 2x"
-                alt="Название товара"
-              />
-            </a>
-          </li>
-        </ul>
       </div>
 
       <div class="item__info">
@@ -99,25 +75,9 @@
         </div>
       </div>
 
-      <div class="item__desc">
-        <ul class="tabs">
-          <li class="tabs__item" v-for="tab of tabs" :key="tab.name">
-            <a
-              class="tabs__link"
-              :class="{ 'tabs__link--current': currentTab === tab.name }"
-              @click.prevent="currentTab = tab.name"
-            >
-              {{ tab.title }}
-            </a>
-          </li>
-        </ul>
+      <AboutProductTabs />
 
-        <div class="item__content">
-          <component :is="currentTabComponent"></component>
-        </div>
-      </div>
-
-      <router-link to="cart" title="Перейти в корзину">
+      <router-link :to="{ name: 'cart' }" title="Перейти в корзину">
         <NotifyMessage
           :showMessage="successfulRequestNotify"
           text="Товар добавлен в корзину"
@@ -134,32 +94,23 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import AboutProductTabs from '@/components/AboutProductTabs.vue';
+import changeImage from '@/mixins/changeImage.vue';
 import NotifyMessage from '@/components/NotifyMessage.vue';
 import BreadCrumbs from '@/components/BreadCrumbs.vue';
-import ProductDescription from '@/components/ProductDescription.vue';
-import ProductDeliveryInfo from '@/components/ProductDeliveryInfo.vue';
 import CounterInput from '@/components/CounterInput.vue';
-import Loader from '@/components/Loader.vue';
-import Error from '@/components/Error.vue';
+import LoaderElement from '@/components/LoaderElement.vue';
+import ErrorNotify from '@/components/ErrorNotify.vue';
 
 export default {
+  name: 'ProductPage',
+
+  mixins: [changeImage],
+
   data() {
     return {
-      tabs: [
-        {
-          name: 'description',
-          title: 'Информация о товаре',
-          component: ProductDescription,
-        },
-        {
-          name: 'delivery',
-          title: 'Доставка и возврат',
-          component: ProductDeliveryInfo,
-        },
-      ],
       selectedColorId: '',
       selectedSizeId: '',
-      currentTab: 'description',
       quantityProducts: 1,
       loadingProduct: false,
       errorResponse: false,
@@ -174,10 +125,6 @@ export default {
 
     product() {
       return this.$store.state.productData;
-    },
-
-    currentTabComponent() {
-      return this.tabs.find((tab) => tab.name === this.currentTab).component;
     },
 
     category() {
@@ -233,6 +180,7 @@ export default {
         this.selectedColorId = defaultColor;
       }
     },
+
     setDefaultSize() {
       const defaultSize = this.product.sizes[0].id;
       if (defaultSize) {
@@ -243,12 +191,11 @@ export default {
 
   components: {
     BreadCrumbs,
-    ProductDescription,
-    ProductDeliveryInfo,
     CounterInput,
-    Loader,
-    Error,
+    LoaderElement,
+    ErrorNotify,
     NotifyMessage,
+    AboutProductTabs,
   },
 
   watch: {
@@ -259,6 +206,7 @@ export default {
   },
 
   created() {
+    this.$store.commit('clearTimerNotify');
     this.loadProduct();
   },
 };

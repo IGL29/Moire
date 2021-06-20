@@ -4,6 +4,8 @@
 
 <script>
 export default {
+  name: 'FieldInput',
+
   props: ['placeholder', 'type', 'value'],
 
   computed: {

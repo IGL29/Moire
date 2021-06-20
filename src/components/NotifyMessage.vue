@@ -6,6 +6,8 @@
 
 <script>
 export default {
+  name: 'NotifyMessage',
+
   props: ['showMessage', 'text'],
 };
 </script>

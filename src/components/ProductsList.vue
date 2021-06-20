@@ -1,7 +1,7 @@
 <template>
-  <Loader v-if="loading" />
+  <LoaderElement v-if="loading" />
 
-  <Error v-else-if="error"/>
+  <ErrorNotify v-else-if="error"/>
 
   <ProductsNotFound v-else-if="!products.length" :message="messageNotFoundProducts" />
 
@@ -12,11 +12,13 @@
 
 <script>
 import ProductsItem from '@/components/ProductsItem.vue';
-import Loader from '@/components/Loader.vue';
-import Error from '@/components/Error.vue';
+import LoaderElement from '@/components/LoaderElement.vue';
+import ErrorNotify from '@/components/ErrorNotify.vue';
 import ProductsNotFound from '@/components/ProductsNotFound.vue';
 
 export default {
+  name: 'ProductsList',
+
   props: ['products', 'error', 'loading'],
 
   data() {
@@ -27,8 +29,8 @@ export default {
 
   components: {
     ProductsItem,
-    Loader,
-    Error,
+    LoaderElement,
+    ErrorNotify,
     ProductsNotFound,
   },
 };

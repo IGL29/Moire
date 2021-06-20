@@ -124,6 +124,8 @@
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
+  name: 'FilterForm',
+
   computed: {
     ...mapGetters([
       'filters',

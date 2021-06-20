@@ -42,6 +42,8 @@
 import { mapGetters } from 'vuex';
 
 export default {
+  name: 'InputNumberItems',
+
   props: ['loading', 'error'],
 
   computed: {

@@ -25,6 +25,8 @@ import ErrorField from '@/components/ErrorField.vue';
 import FieldTextarea from '@/components/FieldTextarea.vue';
 
 export default {
+  name: 'FormField',
+
   props: ['formElement', 'label', 'placeholder', 'type', 'value', 'errorText'],
 
   computed: {

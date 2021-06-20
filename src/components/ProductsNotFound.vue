@@ -7,6 +7,8 @@
 
 <script>
 export default {
+  name: 'ProductsNotFound',
+
   props: ['message'],
 };
 </script>

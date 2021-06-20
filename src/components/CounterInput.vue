@@ -33,6 +33,8 @@
 <script>
 
 export default {
+  name: 'CounterInput',
+
   props: ['number'],
   data() {
     return {

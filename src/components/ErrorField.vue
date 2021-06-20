@@ -4,6 +4,8 @@
 
 <script>
 export default {
+  name: 'ErrorField',
+
   props: ['error'],
 };
 </script>

@@ -9,6 +9,8 @@
 
 <script>
 export default {
+  name: 'ErrorOrder',
+
   props: ['errorMessage'],
 };
 </script>

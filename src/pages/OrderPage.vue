@@ -24,7 +24,7 @@
               formElement="input"
               label="ФИО"
               type="text"
-              placeholder="Введите ваше полное имя"
+              placeholder="Иванова Анастасия Ивановна"
               v-model="formData.name"
               :errorText="formErrors.name"
             />
@@ -33,7 +33,7 @@
               formElement="input"
               label="Адрес доставки"
               type="text"
-              placeholder="Введите ваш адрес"
+              placeholder="Город, улица, дом, номер квартиры"
               v-model="formData.address"
               :errorText="formErrors.address"
             />
@@ -42,7 +42,7 @@
               formElement="input"
               label="Телефон"
               type="tel"
-              placeholder="Введите ваш телефон"
+              placeholder="+79876543210"
               v-model="formData.phone"
               :errorText="formErrors.phone"
             />
@@ -51,7 +51,7 @@
               formElement="input"
               label="Email"
               type="email"
-              placeholder="Введи ваш Email"
+              placeholder="ivanova@email.ru"
               v-model="formData.email"
               :errorText="formErrors.email"
             />
@@ -130,6 +130,8 @@ import CartProductsInfo from '@/components/CartProductsInfo.vue';
 import ErrorOrder from '@/components/ErrorOrder.vue';
 
 export default {
+  name: 'OrderPage',
+
   data() {
     return {
       formData: {},

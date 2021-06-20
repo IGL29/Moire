@@ -28,6 +28,8 @@
 import CartIndicator from '@/components/CartIndicator.vue';
 
 export default {
+  name: 'Header',
+
   components: {
     CartIndicator,
   },

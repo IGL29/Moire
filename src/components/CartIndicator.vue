@@ -14,6 +14,8 @@
 
 <script>
 export default {
+  name: 'CartIndicator',
+
   computed: {
     numberProducts() {
       return this.$store.getters.numberProductsInCart;

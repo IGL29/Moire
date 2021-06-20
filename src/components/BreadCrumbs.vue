@@ -16,6 +16,8 @@
 
 <script>
 export default {
+  name: 'BreadCrumbs',
+
   props: ['routePages', 'currentNamePageText'],
 };
 </script>

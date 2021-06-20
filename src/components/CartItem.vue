@@ -46,6 +46,8 @@
 import CounterInput from '@/components/CounterInput.vue';
 
 export default {
+  name: 'CartItem',
+
   props: ['product'],
 
   data() {
